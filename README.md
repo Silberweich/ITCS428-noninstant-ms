@@ -19,7 +19,7 @@
 - No security, user can request any message as long as they know the username
 - ***Server***:
   - Server run constantly, waiting for TCP connection on (IP, port)
-    - server send or receive message
+    - server send(by client request) or receive message
     - once there is a request, server reads a JSON file for all matching `to`. Then send those data. Find a way to clear all the memory afterward?
 - ***Client***:
   - Client will not store any persistent data

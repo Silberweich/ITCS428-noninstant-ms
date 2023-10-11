@@ -20,10 +20,14 @@ class Server():
             self.sock.listen(listen)
             print(f"[-] Server Started on {self.host}:{self.port}")
         except Exception as e:
-            print("[-] Server Creation Error:", e)
+            print(f"[-] Server Creation Error:{e}")
     
     def __repr__(self) -> str:
         return f"Server Listening on {self.host}:{self.port} | {self.sock}"
+    
+    def setServingStatus(self, status: bool) -> None:
+        self.servingStatus = status
+        return None
     
     def startServing(self) -> None:
         while self.servingStatus:
@@ -35,6 +39,8 @@ class Server():
                     self.__modeStore(conn)
                 case ReqType.REQ_ALL.value:
                     self.__modeSendAll(conn)
+                case ReqType.REQ_NEW.value:
+                    self.__modeSendNew(conn)
                 case _:
                     print("[-] Invalid Request Type")
                     sleep(5)
@@ -43,6 +49,9 @@ class Server():
         print("[*] in store mode")
         conn.send(ReqType.ACK.value)
         print("[*] ACK sent to", conn.getpeername())
+        data = deserializeMessage(conn.recv(2048))
+        print("[*] Data received from", conn.getpeername())
+        print(f"[*] Data:{data}")
         sleep(2)
         return None
 
@@ -52,7 +61,13 @@ class Server():
         sleep(2)
         return None
     
+    def __modeSendNew(self, conn) -> None:
+        print("[*] in send all mode")
+        conn.send(ReqType.ACK.value)
+        sleep(2)
+        return None
+    
 # Testing for this file
-if __name__ == "__main__":
-    server = Server(socket.gethostname(), 8080, 1)
-    server.startServing()
+# if __name__ == "__main__":
+#     server = Server("127.0.0.1", 8080, 1)
+#     server.startServing()
