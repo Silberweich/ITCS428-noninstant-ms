@@ -38,6 +38,7 @@ class Client():
             self.sock.send(ReqType.STORE.value)
             if self.sock.recv(8) == ReqType.ACK.value:
                 print("[*] ACK received, start sending data...")
+                ## TODO: receive data one by one message
             return True
         except Exception as e:
             print("[-] Message send Error", e)
