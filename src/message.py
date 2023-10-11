@@ -27,6 +27,7 @@ def createMessage(fromUsr: str, toUsr: str, msgData:str) -> Message:
         toUsr, 
         msgData
         )
+
 ## message printing
 def msgPrint(msg: Message):
     print(f"From: {msg.fromUsr}\nTime: {msg.timeStamp}\nMessage: {msg.msgData}\n")
