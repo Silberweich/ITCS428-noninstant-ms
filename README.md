@@ -2,7 +2,7 @@
 ## Submission Requirements
 -	For network side, only low level ***socket*** API is allowed, no urllib, smtp or other application level modules. Work as group of 1-2 people.
 - [x] **25 September 2023**: group member + mockup design
-- [ ] **15 October 2023** [V1]: Single connection, CLI milestone
+- [x] **15 October 2023** [V1]: Single connection, CLI milestone
 - [ ] **25 October 2023** [V2]: Select a multi-connection method
   - [ ] use **Treading**
   - [ ] use **Multi-Process**
