@@ -4,7 +4,7 @@ import time
 import pickle
 import json
 
-## Message dataclass
+## Message dataclass, do not call this directly, createMessage() is cleaner
 #  @brief This dataclass is for message objects
 #  @param msgHash The hash of the messageData
 #  @param fromUsr The username of the sender 
