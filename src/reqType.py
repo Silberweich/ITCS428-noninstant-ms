@@ -8,6 +8,7 @@ class ReqType(Enum):
     REQ_NEW = b"4"
     REQ_HASH = b"5"
     REQ_USER = b"6"
+    REQ_CONVO = b"7"
     FIN = b"8"
 
 # Testing for this file

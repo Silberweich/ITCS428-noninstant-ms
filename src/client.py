@@ -56,7 +56,7 @@ class Client():
             print("[*] REQ_ALL ACK received, start receiving data process...")
             self.sock.send(self.username.encode())
             while True:
-                sleep(0.5)
+                sleep(0.1)
                 print("[*] recving")
                 data = self.sock.recv(4096)
                 
@@ -81,7 +81,7 @@ class Client():
             print("[*] REQ_NEW ACK received, start receiving data process...")
             self.sock.send(self.username.encode())
             while True:
-                sleep(0.5)
+                sleep(0.1)
                 print("[*] recving")
                 data = self.sock.recv(4096)
                 
@@ -95,7 +95,31 @@ class Client():
                 print("[+] Finished Receiving")
             print("[-] Request All Error", e, "Or probably receive all, error handling is hard")
             return messages
+    
+    def requestConvo(self, partner: str) -> List[Message]:
+        messages = []
+        try:
+            self.sock.send(ReqType.REQ_CONVO.value)
+            if self.sock.recv(8) != ReqType.ACK.value: 
+                raise Exception("REQ_ALL ACK not received")
+            print("[*] REQ_CONVO ACK received, start receiving data process...")
+            self.sock.send((self.username + "|" + partner).encode())
+            while True:
+                sleep(0.1)
+                print("[*] recving")
+                data = self.sock.recv(4096)
+                
+                if not data or data == b"": break
+                messages.append(deserializeMessage(data))
+            print("[*] All data received")
+            return messages
         
+        except Exception as e:
+            if e == socket.timeout:
+                print("[+] Finished Receiving")
+            print("[-] Request All Error", e, "Or probably receive all, error handling is hard")
+            return messages
+
     # retrieve message by hash designated for this client (self.username)
     def requestMsgByHash(self, hash: str):
         return None

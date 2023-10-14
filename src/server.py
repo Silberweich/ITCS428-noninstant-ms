@@ -51,7 +51,9 @@ class Server():
                     case ReqType.REQ_NEW.value:
                         self.__modeSendNew(conn)
                     case ReqType.REQ_HASH.value:
-                        self.__modeSendByHash(conn)                 
+                        self.__modeSendByHash(conn)
+                    case ReqType.REQ_CONVO.value:
+                        self.__modeSendConvo(conn)                   
                     case _:
                         print("[-] Invalid Request Type/ User Forcibly Terminated")
                         break
@@ -75,7 +77,7 @@ class Server():
 
         for msg in self.storage.getAllMsg(user):
             conn.sendall(serializeMessage(msg))
-            sleep(0.5)
+            sleep(0.1)
             
         conn.sendall(b"") # send empty string to indicate end of transmission
         return None
@@ -89,11 +91,25 @@ class Server():
 
         for msg in self.storage.getNewMsg(user):
             conn.sendall(serializeMessage(msg))
-            sleep(0.5)
+            sleep(0.1)
             
         conn.sendall(b"")
         return None
     
+    def __modeSendConvo(self, conn) -> None:
+        print("[*] In send convo mode")
+        conn.send(ReqType.ACK.value)
+        sleep(1)
+        user = conn.recv(64).decode().split("|")
+        print(f"[*] User: {user[0]}, requested conversation past with {user[1]}")
+
+        for msg in self.storage.getConvo(user[0], user[1]):
+            conn.sendall(serializeMessage(msg))
+            sleep(0.1)
+        
+        conn.sendall(b"")
+        return None
+
     def __modeSendByHash(self, conn) -> None:
         print("[*] in send all mode")
         conn.send(ReqType.ACK.value)

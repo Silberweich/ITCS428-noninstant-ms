@@ -52,6 +52,7 @@ class StorageSolution():
             if msg.toUsr == user and msg.timesRequested == 0:
                 messages.append(msg)
                 msg.incRequested()
+                if msg.firstRequested == 0: msg.setFirstRequested()
         self.__updateAllMsg()
         return messages
     
@@ -62,9 +63,21 @@ class StorageSolution():
             if msg.toUsr == user:
                 messages.append(msg)
                 msg.incRequested()
+                if msg.firstRequested == 0: msg.setFirstRequested()
         self.__updateAllMsg()
         return messages
     
+    def getConvo(self, user:str, partner:str) -> List[Message]:
+        self.__loadMsgLine()
+        messages = []
+        for msg in self.msgLine:
+            if (msg.toUsr == user and msg.fromUsr == partner) or (msg.toUsr == partner and msg.fromUsr == user):
+                messages.append(msg)
+                msg.incRequested()
+                if msg.firstRequested == 0: msg.setFirstRequested()
+        self.__updateAllMsg()
+        return messages
+
 #  if __name__ == "__main__":
     # store = StorageSolution(Path.cwd())
     

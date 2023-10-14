@@ -7,6 +7,10 @@ import argparse
 
 ## Every CLI component will be written in this file
 
+prompt = "\nWhat do you want to do? \n(1. sendmessage, 2. get all message, 3. get new (unread) messagges, 4. get convo, 5. exit): \n>"
+prettyprint = "\n[>] From: {u} -> {t} \n[>] Time: {s} \n[>] Message: {m}"
+convoprint = "\n[{x}] From: {u} -> {t} \n[{x}] Time: {s}{r} \n[{x}] Message: {m}"
+
 both_mode = lambda s, c: not (s and c)
 
 parser = argparse.ArgumentParser(
@@ -48,8 +52,7 @@ def clientMode() -> None:
     print("Initializing Client...")
     client = Client(user, args.address, args.port)
     client.connect()
-    prompt = "\nWhat do you want to do? \n(1. sendmessage, 2. get all message, 3. get new (unread) messagges, 4. exit): \n>"
-    prettyprint = "\n[>] From: {u} \n[>] Time: {s} \n[>] Message: {m}"
+
     while True:
         match int(input(prompt).lower().strip()):
             case 1:
@@ -57,17 +60,32 @@ def clientMode() -> None:
                 msg = input("Enter message: ")
                 client.sendMsg(createMessage(user, toUser, msg))
             case 2:
-                [print(prettyprint.format(u = i.fromUsr, 
+                [print(prettyprint.format(u = i.fromUsr,
+                                          t = i.toUsr, 
                                           s = datetime.datetime.fromtimestamp(i.timeStamp), 
                                           m = i.msgData)) 
                                         for i in client.requestAllMsg()]
             case 3:
-                [print(prettyprint.format(u = i.fromUsr, 
+                [print(prettyprint.format(u = i.fromUsr,
+                                          t = i.toUsr, 
                                           s = datetime.datetime.fromtimestamp(i.timeStamp), 
                                           m = i.msgData)) 
                                         for i in client.requestNewMsg()] 
-            case 4: 
+            case 4:
+                partner = input("who is the conversation partner:")
+                client.requestConvo(partner)
+                [print(convoprint.format (x = ">" if i.fromUsr == user else "<",
+                                          u = i.fromUsr,
+                                          t = i.toUsr,
+                                          s = datetime.datetime.fromtimestamp(i.timeStamp),
+                                          r = f"| READ On: {datetime.datetime.fromtimestamp(i.firstRequested)}" if i.fromUsr == user else "",
+                                          m = i.msgData))
+                                        for i in client.requestConvo(partner)]
+            case 5: 
                 client.disconnect()
                 exit()
+            case _:
+                print("Invalid input, please try again")
+                continue
 
 main()

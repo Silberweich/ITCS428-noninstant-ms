@@ -17,10 +17,15 @@ class Message:
     toUsr: str
     msgData: str
     timesRequested: int = 0
+    firstRequested: float = 0
     timeStamp: float = time.time()
 
     def incRequested(self):
         self.timesRequested += 1
+        return True
+    
+    def setFirstRequested(self):
+        self.firstRequested = time.time()
         return True
 
 ## createMessage
