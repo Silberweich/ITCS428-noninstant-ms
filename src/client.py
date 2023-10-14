@@ -38,7 +38,7 @@ class Client():
             self.sock.send(ReqType.STORE.value)
             if self.sock.recv(8) == ReqType.ACK.value:
                 print("[*] ACK received, start sending data...")
-                ## TODO: receive data one by one message
+                self.sock.send(serializeMessage(msg))
             return True
         except Exception as e:
             print("[-] Message send Error", e)
@@ -73,9 +73,9 @@ class Client():
         return None
 
 # Testing for this file
-# if __name__ == "__main__":
-#     server = Client("jojo", "127.0.0.1", 8080)
-#     message = createMessage("jo", "mama", "hello mama mama hello lalalakll")
-#     server.connect()
-#     server.sendMsg(message)
-#     sleep(5)
+if __name__ == "__main__":
+    server = Client("jojo", "127.0.0.1", 8080)
+    message = createMessage("jo", "mama", "hello mama mama hello lalalakll")
+    server.connect()
+    server.sendMsg(message)
+    sleep(5)

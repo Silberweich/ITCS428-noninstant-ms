@@ -1,7 +1,9 @@
 from message import Message, createMessage, deserializeMessage, serializeMessage
+from storage import StorageSolution
 from reqType import ReqType
+
 from time import sleep
-import pickle
+from pathlib import Path
 import threading
 import socket
 
@@ -11,7 +13,7 @@ class Server():
 
     servingStatus = True
 
-    def __init__(self, host: str, port: int, listen: int) -> None:
+    def __init__(self, host: str, port: int, listen: int, file: Path) -> None:
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,7 +53,7 @@ class Server():
         print("[*] ACK sent to", conn.getpeername())
         data = deserializeMessage(conn.recv(2048))
         print("[*] Data received from", conn.getpeername())
-        print(f"[*] Data:{data}")
+        print(f"[*] Data:{type(data)}")
         sleep(2)
         return None
 
@@ -68,6 +70,6 @@ class Server():
         return None
     
 # Testing for this file
-# if __name__ == "__main__":
-#     server = Server("127.0.0.1", 8080, 1)
-#     server.startServing()
+if __name__ == "__main__":
+    server = Server("127.0.0.1", 8080, 1)
+    server.startServing()

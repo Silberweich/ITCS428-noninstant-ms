@@ -39,10 +39,10 @@ def msgPrint(msg: Message):
     return True
 
 ## JSON conversion for message
-def MessageToJSON(msg: Message) -> str:
+def messageToJSON(msg: Message) -> str:
     return json.dumps(msg.__dict__)
 
-def JSONToMessage(jsonMsg: str) -> Message:
+def messageFromJSON(jsonMsg: str) -> Message:
     return Message(**json.loads(jsonMsg))
 
 ## serializeMessage and deserializeMessage
@@ -57,9 +57,9 @@ def deserializeMessage(msg: bytes) -> Message:
 if __name__ == "__main__":
     message = createMessage("jo", "mama", "hello mama")
     print(message)
-    js = MessageToJSON(message)
+    js = messageToJSON(message)
     print(js)
-    print(JSONToMessage(js)) 
+    print(messageFromJSON(js)) 
     # print(datetime.datetime.now())
     # semsg = serializeMessage(message)
     # print(">>", semsg)
