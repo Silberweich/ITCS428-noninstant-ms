@@ -1,33 +1,36 @@
-from src.message import Message, messageToJSON, messageFromJSON, createMessage, msgPrint
+from src.message import Message, messageToJSON, messageFromJSON
 
 from typing import List
 from pathlib import Path
 
-## Extremely inefficient storage solution, 
-#  read everything from file to mem, update mem, then write mem to file on every operation haha
+## @brief Class for creating StorageSolution object, direct interaction with file storage.
+# @param host: host address of the server
+# @param port: port of the server
+# @param listen: number of connection to listen to simultaneously
+# @param path: storage path, pass to StorageSolution
 class StorageSolution():
     def __init__(self, path: Path)-> None:
         self.path = path / "store.txt"
         self.file = open(self.path, "a+")
         self.msgLine = []
         self.__loadMsgLine()
-        print(f"[+] DB: {self.msgLine}")
 
     def closeFileHandler(self, user:str) -> None:
         self.file.close()
-
-    def storeMsg(self, msg: Message) -> bool:
-        print(f"[+] Storing message: {msg}")
-        self.__loadMsgLine()
-        self.msgLine.append(msg)
-        self.__updateAllMsg()
-        return True
     
+    ## @brief private method, load every line of message from storage file
+    # @param None
+    # @details read every line of the storage file, and load it on self.msgLine
+    # @return None
     def __loadMsgLine(self) -> None:
         self.file.seek(0)
         self.msgLine = [messageFromJSON(line.rstrip()) for line in self.file.readlines()]
         return None
     
+    ## @brief private method, update data inside storage file
+    # @param None
+    # @details delete everything in the file, then rewrite with current self.msgLine, good update method
+    # @return None
     def __updateAllMsg(self) -> None:
         self.file.seek(0)
         self.file.truncate()
@@ -35,27 +38,22 @@ class StorageSolution():
             self.file.write(messageToJSON(msg).rstrip() + "\n")
         self.file.flush()
         return None
-
-    def getMsgByHash(self, user:str, hash:str) -> Message:
-        self.__loadMsgLine()
-        for msg in self.msgLine:
-            if msg.toUsr == user and msg.msgHash == hash:
-                msg.incRequested()
-                self.__updateAllMsg()
-                return msg
-        return None
     
-    def getNewMsg(self, user:str) -> List[Message]:
+    ## @brief store the new message to storage file
+    # @param msg: The message to be appended to storage file
+    # @details -
+    # @return None
+    def storeMsg(self, msg: Message) -> bool:
+        print(f"[+] Storing message: {msg}")
         self.__loadMsgLine()
-        messages = []
-        for msg in self.msgLine:
-            if msg.toUsr == user and msg.timesRequested == 0:
-                messages.append(msg)
-                msg.incRequested()
-                if msg.firstRequested == 0: msg.setFirstRequested()
+        self.msgLine.append(msg)
         self.__updateAllMsg()
-        return messages
+        return True
     
+    ## @brief get all message for a user
+    # @param user: the username to get all message for 
+    # @details get all message for user, and increment timesRequested, set firstRequested if it's 0
+    # @return List of messages
     def getAllMsg(self, user:str) -> List[Message]:
         self.__loadMsgLine()
         messages = []
@@ -67,6 +65,26 @@ class StorageSolution():
         self.__updateAllMsg()
         return messages
     
+    ## @brief get new (unread) message for a user
+    # @param user: the username to get all message for
+    # @details get new (unread) message for user, and increment timesRequested, set firstRequested if it's 0
+    # @return List of messages
+    def getNewMsg(self, user:str) -> List[Message]:
+        self.__loadMsgLine()
+        messages = []
+        for msg in self.msgLine:
+            if msg.toUsr == user and msg.timesRequested == 0:
+                messages.append(msg)
+                msg.incRequested()
+                if msg.firstRequested == 0: msg.setFirstRequested()
+        self.__updateAllMsg()
+        return messages
+    
+    ## @brief private method, update data inside storage file
+    # @param user: 
+    # @param partner:
+    # @details 
+    # @return List of messages
     def getConvo(self, user:str, partner:str) -> List[Message]:
         self.__loadMsgLine()
         messages = []
@@ -78,10 +96,4 @@ class StorageSolution():
         self.__updateAllMsg()
         return messages
 
-#  if __name__ == "__main__":
-    # store = StorageSolution(Path.cwd())
-    
-    # print(store.msgLine)
-    # # print("\n\n>", store.getNewMsg("testrecv"))
-    # print("\n\n>", store.getAllMsg("testrecv"))
-    # print("\n\n>", store.getMsgByHash("to","fe7f20fc7974ef4b8aa9727966133ba5"))
+

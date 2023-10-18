@@ -1,4 +1,4 @@
-from src.message import Message, createMessage, deserializeMessage, serializeMessage
+from src.message import deserializeMessage, serializeMessage
 from src.storage import StorageSolution
 from src.reqType import ReqType
 
@@ -7,8 +7,11 @@ from pathlib import Path
 import threading
 import socket
 
-## Server class
-# @brief This class is used to create a server object
+## @brief Class for creating server object, and serving client
+# @param host: host address of the server
+# @param port: port of the server
+# @param listen: number of connection to listen to simultaneously
+# @param path: storage path, pass to StorageSolution
 class Server():
 
     servingStatus = True
@@ -37,6 +40,9 @@ class Server():
         self.servingStatus = status
         return None
     
+    ## @brief start serving, pick modes according to request type sent by client
+    #  @param None
+    #  @details loop forever, accept connection, spawn thread to handle connection (phase 2)
     def startServing(self) -> None:
         while self.servingStatus:
             conn, addr = self.sock.accept()
@@ -57,7 +63,11 @@ class Server():
                     case _:
                         print("[-] Invalid Request Type/ User Forcibly Terminated")
                         break
-
+    
+    ## @brief private method, handle storage of data sent by client
+    # @param conn: connection object from startServing()
+    # @details After startServing() receive ReqType.STORE, it will enter this mode which calls self.storage to store the message
+    # @return None
     def __modeStore(self, conn) -> None:
         print("[*] in store mode")
         conn.send(ReqType.ACK.value)
@@ -67,6 +77,10 @@ class Server():
         print(self.storage.storeMsg(data))
         return None
 
+    ## @brief private method, handle sending all message to client
+    # @param conn: connection object from startServing()
+    # @details After startServing() receive ReqType.REQ_ALL, it will enter this mode which calls self.storage to get all messages
+    # @return None
     def __modeSendAll(self, conn) -> None:
         print("[*] in send all mode")
         conn.send(ReqType.ACK.value)
@@ -79,9 +93,13 @@ class Server():
             conn.sendall(serializeMessage(msg))
             sleep(0.1)
             
-        conn.sendall(b"") # send empty string to indicate end of transmission
+        conn.sendall(b"")
         return None
     
+    ## @brief private method, handle sending unread/new message to client
+    # @param conn: connection object from startServing()
+    # @details After startServing() receive ReqType.REQ_NEW, it will enter this mode which calls self.storage to get new messages
+    # @return None
     def __modeSendNew(self, conn) -> None:
         print("[*] in send New mode")
         conn.send(ReqType.ACK.value)
@@ -96,6 +114,10 @@ class Server():
         conn.sendall(b"")
         return None
     
+    ## @brief private method, handle sending list message between two user (client, partner) to the requesting client
+    # @param conn: connection object from startServing()
+    # @details After startServing() receive ReqType.REQ_CONVO, it will enter this mode which calls self.storage to message between two users.
+    # @return None
     def __modeSendConvo(self, conn) -> None:
         print("[*] In send convo mode")
         conn.send(ReqType.ACK.value)
@@ -109,14 +131,4 @@ class Server():
         
         conn.sendall(b"")
         return None
-
-    def __modeSendByHash(self, conn) -> None:
-        print("[*] in send all mode")
-        conn.send(ReqType.ACK.value)
-        sleep(2)
-        return None
     
-# Testing for this file
-# if __name__ == "__main__":
-#     server = Server("127.0.0.1", 8080, 1, Path.cwd())
-#     server.startServing()

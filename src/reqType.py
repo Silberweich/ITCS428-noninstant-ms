@@ -10,7 +10,3 @@ class ReqType(Enum):
     REQ_USER = b"6"
     REQ_CONVO = b"7"
     FIN = b"8"
-
-# Testing for this file
-if __name__ == "__main__":
-    print(ReqType.ACK.value)

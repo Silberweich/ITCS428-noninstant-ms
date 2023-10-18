@@ -1,12 +1,13 @@
-from src.message import Message, createMessage, deserializeMessage, serializeMessage
+from src.message import Message, deserializeMessage, serializeMessage
 from src.reqType import ReqType
 from time import sleep
 from typing import List
-import pickle
 import socket
 
-## Client class
-# @brief This class is used to create a client object connecting to server
+## @brief Class for creating client object
+# @param username: username of the client in this instance
+# @param host: host address of the server
+# @param port: port of the server
 class Client():
     def __init__(self, username: str, host: str, port: int) -> None:
         self.username = username
@@ -17,7 +18,8 @@ class Client():
     
     def __repr__(self) -> str:
         return f"Client {self.username} Connected to: ({self.host}, {self.port})"
-
+    
+    ## @brief Open socket, connect to server
     def connect(self) -> bool:
         try:
             self.sock.connect((self.host, self.port))
@@ -26,6 +28,7 @@ class Client():
             print("[-] Connection Error", e)
             return False
     
+    ## @brief close socket
     def disconnect(self) -> bool:
         try:
             self.sock.close()
@@ -34,7 +37,9 @@ class Client():
             print("[-] Disconnection Error", e)
             return False
         
-    # send a message to server, server will store the message
+    ## @brief send message to server
+    # @param msg: message to be sent
+    # @details send two packet, first packet is the request type, second packet is the message
     def sendMsg(self, msg: Message) -> bool:
         try:
             self.sock.send(ReqType.STORE.value)
@@ -46,7 +51,10 @@ class Client():
             print("[-] Message send Error", e)
             return False
     
-    # retrieve all message designated for this client (self.username)
+    ## @brief request every messages designated towards self.username
+    # @param None
+    # @details send REQ_ALL to set server mode, wait ACK, send username, wait for data
+    # @return List[Message] list of messages
     def requestAllMsg(self) -> List[Message]:
         messages = []
         try:
@@ -71,7 +79,10 @@ class Client():
             print("[-] Request All Error", e, "Or probably receive all, error handling is hard")
             return messages
     
-    # retrieve new messages (Message.timesRequested == 0), this meant message is not read yet, designated for this client (self.username)
+    ## @brief request every un-read messages designated towards self.username
+    # @param None
+    # @details send REQ_NEW to set server mode, wait ACK, send username, wait for data
+    # @return List[Message] list of messages that has not been requested before
     def requestNewMsg(self) -> List[Message]:
         messages = []
         try:
@@ -96,6 +107,10 @@ class Client():
             print("[-] Request All Error", e, "Or probably receive all, error handling is hard")
             return messages
     
+    ## @brief request conversation between self.username and partner (which is their conversation partner username)
+    # @param partner: conversation partner username
+    # @details send REQ_CONVO to set server mode, wait ACK, send username + partnername, wait for data
+    # @return List[Message] list of messages in the conversation
     def requestConvo(self, partner: str) -> List[Message]:
         messages = []
         try:
@@ -120,15 +135,3 @@ class Client():
             print("[-] Request All Error", e, "Or probably receive all, error handling is hard")
             return messages
 
-    # retrieve message by hash designated for this client (self.username)
-    def requestMsgByHash(self, hash: str):
-        return None
-
-# Testing for this file
-# if __name__ == "__main__":
-#     server = Client("mama", "127.0.0.1", 8080)
-#     message = createMessage("mama", "jo", "hello jojo jojo")
-#     server.connect()
-#     sleep(1)
-#     print(server.requestAllMsg())
-#     server.disconnect()

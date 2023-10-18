@@ -1,6 +1,6 @@
 from src.client import Client
 from src.server import Server
-from src.message import Message, deserializeMessage, serializeMessage, createMessage
+from src.message import createMessage
 from pathlib import Path
 import datetime
 import argparse
