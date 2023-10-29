@@ -4,13 +4,18 @@ from src.message import createMessage
 from pathlib import Path
 import datetime
 import argparse
+import textwrap
 
 import tkinter as tk
 from tkinter import ttk, simpledialog
 
 prompt = "\nWhat do you want to do? \n(1. sendmessage, 2. get all message, 3. get new (unread) messagges, 4. get convo, 5. exit): \n>"
 prettyprint = "\n[>] From: {u} -> {t} \n[>] Time: {s} \n[>] Message: {m}"
-convoprint = "\n[{x}] From: {u} -> {t} \n[{x}] Time: {s}{r} \n[{x}] Message: {m}"
+convoprint = textwrap.dedent("""
+    [{x}] From: {u} -> {t} 
+    [{x}] Time: {s}{r} 
+    [{x}] Message: {m}
+""")
 
 
 class NonInstantMessenger:
@@ -235,14 +240,29 @@ class NonInstantMessenger:
             return
         #self.convo_messages = self.client.requestConvo(self.partner)
         self.conversation_messages_listbox.delete(0, tk.END)
-        #print(self.convo_messages)
+
         for message in self.client.requestConvo(self.partner):
-            self.conversation_messages_listbox.insert(tk.END, convoprint.format (x = ">" if message.fromUsr == self.partner else "<",
-                    u = message.fromUsr,
-                    t = message.toUsr,
-                    s = datetime.datetime.fromtimestamp(message.timeStamp),
-                    r = f"| READ On: {datetime.datetime.fromtimestamp(message.firstRequested)}" if message.fromUsr == self.partner else "",
-                    m = message.msgData))
+
+            if message.fromUsr == self.username:
+                firstline = "[>] From: " + message.fromUsr + " -> " + message.toUsr + "\n"
+                secondline = "[>] Time: " + str(datetime.datetime.fromtimestamp(message.timeStamp))
+                thirdline = "[>] Message: " + message.msgData + "\n"
+                if message.fromUsr == self.username:
+                    secondline += "| READ On: " + str(datetime.datetime.fromtimestamp(message.firstRequested)) + "\n"
+                else:
+                    secondline += "\n"
+                self.conversation_messages_listbox.insert(tk.END, firstline)
+                self.conversation_messages_listbox.insert(tk.END, secondline)
+                self.conversation_messages_listbox.insert(tk.END, thirdline)
+                self.conversation_messages_listbox.insert(tk.END, "\n")
+            else:
+                firstline = "[<] From: " + message.fromUsr + " -> " + message.toUsr + "\n"
+                secondline = "[<] Time: " + str(datetime.datetime.fromtimestamp(message.timeStamp)) + "\n"
+                thirdline = "[<] Message: " + message.msgData + "\n"
+                self.conversation_messages_listbox.insert(tk.END, firstline)
+                self.conversation_messages_listbox.insert(tk.END, secondline)
+                self.conversation_messages_listbox.insert(tk.END, thirdline)
+                self.conversation_messages_listbox.insert(tk.END, "\n")
 
 
 if __name__ == "__main__":
