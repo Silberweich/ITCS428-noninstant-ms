@@ -4,18 +4,12 @@ from src.message import createMessage
 from pathlib import Path
 import datetime
 import argparse
-import textwrap
 
 import tkinter as tk
 from tkinter import ttk, simpledialog
 
 prompt = "\nWhat do you want to do? \n(1. sendmessage, 2. get all message, 3. get new (unread) messagges, 4. get convo, 5. exit): \n>"
 prettyprint = "\n[>] From: {u} -> {t} \n[>] Time: {s} \n[>] Message: {m}"
-convoprint = textwrap.dedent("""
-    [{x}] From: {u} -> {t} 
-    [{x}] Time: {s}{r} 
-    [{x}] Message: {m}
-""")
 
 
 class NonInstantMessenger:
