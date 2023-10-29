@@ -30,6 +30,8 @@ class NonInstantMessenger:
         self.address = "127.0.0.1"
         self.port = 8080
 
+        self.all_messages = []
+
         # First tab for changing username
         self.username_tab = tk.Frame(self.notebook)
         self.notebook.add(self.username_tab, text="Change Username")
@@ -217,7 +219,7 @@ class NonInstantMessenger:
             return
         self.unread_messages = self.client.requestNewMsg()
         self.unread_messages_listbox.delete(0, tk.END)
-        for message in self.all_messages:
+        for message in self.unread_messages:
             self.unread_messages_listbox.insert(tk.END, prettyprint.format(
                 u = message.fromUsr, 
                 t = message.toUsr, 

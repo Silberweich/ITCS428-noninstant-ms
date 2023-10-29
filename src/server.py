@@ -47,8 +47,10 @@ class Server():
         while self.servingStatus:
             conn, addr = self.sock.accept()
             print(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
-            # threading.Thread(target=self.__handleConnection, args=(conn, addr)).start()
-            while self.servingStatus:
+            threading.Thread(target=self.__modeSwitcher, args=(conn, )).start()
+            
+    def __modeSwitcher(self, conn):
+        while self.servingStatus:
                 match conn.recv(8):
                     case ReqType.STORE.value:
                         self.__modeStore(conn)
@@ -63,7 +65,7 @@ class Server():
                     case _:
                         print("[-] Invalid Request Type/ User Forcibly Terminated")
                         break
-    
+
     ## @brief private method, handle storage of data sent by client
     # @param conn: connection object from startServing()
     # @details After startServing() receive ReqType.STORE, it will enter this mode which calls self.storage to store the message
