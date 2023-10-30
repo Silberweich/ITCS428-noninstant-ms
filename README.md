@@ -1,10 +1,29 @@
 # ITCS428: Non-instant Messaging System (Term project)
+
+## User guide
+To start a server:
+```
+$ python cli_main.py -s
+```
+To start a CLI client:
+```
+$ python cli_main.py -c
+```
+To start a CLI Help!!!:
+```
+$ python cli_main.py --help
+```
+To start GUI application:
+```
+$ python gui_main.py
+```
+
 ## Submission Requirements
 -	[x] For network side, only low level ***socket*** API is allowed, no urllib, smtp or other application level modules. Work as group of 1-2 people.
 - [x] **25 September 2023**: group member + mockup design
 - [x] **15 October 2023** [V1]: Single connection, CLI milestone
-- [ ] **25 October 2023** [V2]: Select a multi-connection method
-  - [ ] use **Treading**
+- [x] **25 October 2023** [V2]: Select a multi-connection method
+  - [x] use **Treading**
   - [ ] use **Multi-Process**
 
 ### Project Requirements
